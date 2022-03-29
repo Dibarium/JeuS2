@@ -5,14 +5,9 @@ regime : eau/plante/animal
 comportement : 
 """
 import random
-def create():
-    creature = 'plante'
-    regime = random.choice(['eau','plante','animal'])
-    comportement = 'manger'
-    skin = "?"
-    color = random.randint(0,1000)
-    position = (random.randint(0,10),random.randint(0, 10))
-    return {'type' : creature , 'regime' : regime, 'comportement' : comportement, "skin" : skin, "color" : color, 'position' : position}
+def create(skin,carte):
+    position = set_position(carte)
+    return {"skin" : skin, 'position' : position}
 
 def get_type(creature : dict):
     assert type(creature) is dict
@@ -40,9 +35,15 @@ def set_skin(creature : dict, newskin : str):
     creature['skin'] = newskin
     return creature
 
-def set_position(creature : dict, newposition):
-    creature['position'] = newposition
-    return creature
+def set_position(carte):
+    goodplacement = False
+    while goodplacement != True:
+        x = random.randint(0, len(carte[0]))
+        y = random.randint(0, len(carte))
+        if carte[y][x] == "":
+            goodplacement = True
+            return (x,y)
+
 
 def show(creature):
     pass
