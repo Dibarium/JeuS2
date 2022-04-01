@@ -1,3 +1,10 @@
-def create(carte):
-  carte = [["" for i in range(5)] for i in range(5)]
+def create(sizex : int, sizey : int) -> list:
+  assert type(sizex) is int           #Taille de la carte en x
+  assert type(sizey) is int           #Taille de la carte en y
+  assert type(carte) is list
+  carte = [["" for i in range(sizex)] for i in range(sizey)]
+  return carte
 
+
+def get_carte(carte):
+  return carte
