@@ -1,6 +1,4 @@
 import random
-import Gamedata
-
 def create(position : tuple, skin : str, r_action : int) -> dict:
     skin = "?"
     return {"skin" : skin, 'position' : position, 'r_action' : r_action, 'manger' : False}
@@ -21,6 +19,13 @@ def get_manger(creature : dict) -> bool:
     assert type(creature) is dict
     return creature['manger']
 
+def get_allposition(gamedata : dict) -> list:
+    assert type(gamedata) is dict
+    position = []
+    for i in gamedata['entities']:
+        for y in gamedata['entities'][i]:
+            position.append(y['position'])
+    return position
 
 def set_skin(creature : dict, newskin : str) -> dict:
     assert type(creature) is dict
@@ -33,10 +38,6 @@ def set_position(creature : dict, newposition) -> dict:
     Return a dict with new position
     """
     creature['position'] = newposition
-    return creature
-
-def set_manger(creature : dict, etat : bool) -> dict :
-    creature["manger"] = etat
     return creature
 
 def placement(gamedata : dict) -> tuple:
@@ -110,23 +111,6 @@ def move(creature : dict, direction : str, gamedata : dict) -> dict:
         print('error')
         assert 'pasdemove'
 
-def can_reproduce(creature, gamedata, allposition):
-    c = 0
-    for i in allposition:
-        if Gamedata.distance(creature['position'], i) == 1:
-            c += 1
-    if c == 8:
-        return False
-    return True
-
-def reproduce(creature, gamedata, allposition):
-    position = creature['position']
-    nearby = Gamedata.get_allposition_nearby(gamedata, position)
-    for i in nearby:
-        if i not in allposition:
-            Gamedata.addHerbivore(gamedata, i, "?", 10)
-
-
 def show(creature):
     pass
 
@@ -134,7 +118,7 @@ if __name__ == "__main__":
     gamedata = {
     'carte' : [[[] for i in range(0,10)] for y in range(0,10)], 
     'entities' : {
-        'plantes': [{'position' : (2,0)},{'position' : (3,4)}],
+        'plante': [{'position' : (3,0)},{'position' : (3,4)}],
         'carnivores': [{'position' : (1,2)}],
         'herbivores': [{'position' : (5,2)}]}}
     creature = create((0,0),"?", 10)
