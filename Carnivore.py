@@ -1,7 +1,8 @@
 import random
-def create(position : tuple, skin : str, r_action : int) -> dict:
+import Gamedata
+def create(position : tuple) -> dict:
     skin = "?"
-    return {"skin" : skin, 'position' : position, 'r_action' : r_action, 'manger' : False}
+    return {"skin" : skin, 'position' : position, 'manger' : False}
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict

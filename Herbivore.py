@@ -1,17 +1,16 @@
 import random
 import Gamedata
+import Map
+import sys
+import os
 
-def create(position : tuple, skin : str, r_action : int) -> dict:
-    skin = "?"
-    return {"skin" : skin, 'position' : position, 'r_action' : r_action, 'manger' : False}
+def create(position : tuple) -> dict:
+    skin = "■"
+    return {"skin" : skin, 'position' : position, 'manger' : False}
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict
     return creature["skin"]
-
-def get_r_action(creature : dict) -> int:
-    assert type(creature) is dict
-    return creature["r_action"]
 
 def get_position(creature : dict) -> bool:
     assert type(creature) is dict
@@ -20,7 +19,6 @@ def get_position(creature : dict) -> bool:
 def get_manger(creature : dict) -> bool:
     assert type(creature) is dict
     return creature['manger']
-
 
 def set_skin(creature : dict, newskin : str) -> dict:
     assert type(creature) is dict
@@ -39,15 +37,15 @@ def set_manger(creature : dict, etat : bool) -> dict :
     creature["manger"] = etat
     return creature
 
-def placement(gamedata : dict) -> tuple:
+def randomposition(gamedata : dict) -> tuple:
     assert type(gamedata) is dict
+    allposition = Gamedata.get_allposition(gamedata)
+    mapsize = Map.get_size(gamedata['carte'])
 
-    maplength = (len(gamedata['carte'][0]), len(gamedata['carte']))
-    allpos = Gamedata.get_allposition(gamedata)
     goodposition = False
     while goodposition != True:
-        newposition = (random.randint(0, maplength[0]), random.randint(0, maplength[1]))
-        if newposition not in allpos:
+        newposition = (random.randint(0, mapsize[0]-1), random.randint(0, mapsize[1]-1))
+        if valid_move(gamedata, allposition, newposition):
             goodposition = True
             return newposition
 
@@ -57,90 +55,136 @@ def isinmap(newposition : tuple, carte : list) -> bool:
     """
     assert type(newposition) is tuple
     assert type(carte) is list
-    lenghtmap = (len(carte[0]), len(carte))
+    lenghtmap = (len(carte[0])-1, len(carte)-1)
     if newposition[0] >= 0 and newposition[0] <= lenghtmap[0] and newposition[1] >= 0 and newposition[1] <= lenghtmap[1] :
         return True
     else: 
         return False 
 
-def valid_move(creature : dict, allposition : list, newposition : tuple) -> dict:
+def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
     Tells you if a move is possible or not
     """
     assert type(newposition) is tuple
     assert type(allposition) is list
-    assert type(creature) is dict
     if newposition not in allposition and isinmap(newposition, gamedata['carte']) :
         return True
     else:
         return False
 
-def move(creature : dict, direction : str, gamedata : dict) -> dict:
+def move(creature : dict, gamedata : dict, direction : str, allposition : list()) -> dict:
+    """Move character"""
     actualposition = creature['position']
-    allposition = get_allposition(gamedata)
 
     if direction == 'Down':
         newposition = (actualposition[0], actualposition[1]+1)
-        if valid_move(creature, allposition, newposition):
-            return set_position(creature, newposition), True
+        if valid_move(gamedata, allposition, newposition):
+            return set_position(creature, newposition)
         else:
-            return creature, False
+            return creature
 
     elif direction == 'Up':
         newposition = (actualposition[0], actualposition[1]-1)
-        if valid_move(creature, allposition, newposition):
-            return set_position(creature, newposition), True
+        if valid_move(gamedata, allposition, newposition):
+            return set_position(creature, newposition)
         else:
-            return creature, False
+            return creature
 
     elif direction == "Left":
         newposition = (actualposition[0]-1, actualposition[1])
-        if valid_move(creature, allposition, newposition):
-            return set_position(creature, newposition), True
+        if valid_move(gamedata, allposition, newposition):
+            return set_position(creature, newposition)
         else:
-            return creature, False
+            return creature
     
     elif direction == 'Right':
         newposition = (actualposition[0]+1, actualposition[1])
-        if valid_move(creature, allposition, newposition):
-            return set_position(creature, newposition), True
+        if valid_move(gamedata, allposition, newposition):
+            return set_position(creature, newposition)
         else:
-            return creature, False
+            return creature
     else :
         print('error')
         assert 'pasdemove'
 
-def can_reproduce(creature, gamedata, allposition):
-    c = 0
-    for i in allposition:
-        if Gamedata.distance(creature['position'], i) == 1:
-            c += 1
-    if c == 8:
+
+
+def can_reproduce(creature, gamedata, allposition) -> bool:
+    """return True if there's room"""
+    if Gamedata.count_nearby_entities(gamedata, creature, allposition) == 8:
         return False
     return True
 
-def reproduce(creature, gamedata, allposition):
+def reproduce(creature, gamedata, allposition) -> dict:
+    """place another herbivore around"""
     position = creature['position']
-    nearby = Gamedata.get_allposition_nearby(gamedata, position)
-    for i in nearby:
-        if i not in allposition:
-            Gamedata.addHerbivore(gamedata, i, "?", 10)
+    nearbyposition = Gamedata.get_allposition_nearby(gamedata, position)
+    for i in nearbyposition:
+        if i not in allposition and isinmap(i, gamedata['carte']):
+            gamedata = Gamedata.addHerbivore(gamedata, i)
+            return gamedata
 
+def caneat(creature, gamedata) -> bool:
+    """return True if plante nearby""" 
+    plantepos = Gamedata.get_plante_position(gamedata)
+    if Gamedata.count_nearby_entities(gamedata, creature, plantepos) >= 1:
+        return True
+    return False
+
+def eat(creature, gamedata) -> dict:
+    """found plante nearby and pop it"""
+    plantes = Gamedata.get_plante(gamedata)
+    for i in range(len(plantes)):
+        if Gamedata.distance(plantes[i]['position'], creature['position']) == 1:
+            gamedata = Gamedata.kill_plante(gamedata, i)
+            return gamedata
+
+def gotofood(creature, gamedata, allposition) -> tuple:
+    plantepos = Gamedata.get_plante_position(gamedata)
+    creaturepos = creature['position']
+    closestplante = (Gamedata.distance(creaturepos, plantepos[0]), plantepos[0])
+    for i in plantepos:
+        distance = Gamedata.distance(creaturepos, i)
+        if distance < closestplante[0]:
+            closestplante = (distance,i)
+
+    plantepos = closestplante[1]
+    if creaturepos[0] != plantepos[0] and creaturepos[1] != plantepos[1]:
+        i = random.randint(0,1)
+        if i == 0:
+            if plantepos[0] > creaturepos[0]:
+                return move(creature, gamedata, "Right", allposition)
+            else:
+                return move(creature, gamedata, "Left", allposition)
+        else :
+            if plantepos[1] > creaturepos[1]:
+                return move(creature, gamedata, "Down", allposition)
+            else:
+                return move(creature, gamedata, "Up", allposition)
+
+    elif creaturepos[1] != plantepos[1]:
+        if plantepos[1] > creaturepos[1]:
+            return move(creature, gamedata, "Down", allposition)
+        else:
+            return move(creature, gamedata, "Up", allposition)
+
+    elif creaturepos[0] != plantepos[0]:
+        if plantepos[0] > creaturepos[0]:
+            return move(creature, gamedata, "Right", allposition)
+        else:
+            return move(creature, gamedata, "Left", allposition)
+    
+        
+        
 
 def show(creature):
-    pass
+    creaturepo = (creature["position"][0],creature["position"][1])
+    sys.stdout.write("\033["+str(creaturepo[1]+1)+";"+str(creaturepo[1]+1)+"H")
+    sys.stdout.write(creature["skin"])
 
 if __name__ == "__main__":
-    gamedata = {
-    'carte' : [[[] for i in range(0,10)] for y in range(0,10)], 
-    'entities' : {
-        'plantes': [{'position' : (2,0)},{'position' : (3,4)}],
-        'carnivores': [{'position' : (1,2)}],
-        'herbivores': [{'position' : (5,2)}]}}
-    creature = create((0,0),"?", 10)
-    print(creature)
-    creature, asmoved = move(creature,'Right',gamedata)
-    print(creature)
-    print(asmoved)
-
-
+    gamedata = Gamedata.create(2, 2, (10,10))
+    allpos = Gamedata.get_allposition(gamedata)
+    gamedata = Gamedata.addHerbivore(gamedata, (0,0))
+    creature = create((0,0))
+    

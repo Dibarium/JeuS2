@@ -3,31 +3,26 @@ import Herbivore
 import Plante
 import Map
 import random
+import math
 
-def create(nbcarnivore : int, nbherbivore : int, mapsize : tuple) -> dict:
+def create() -> dict:
     gamedata = dict()
-    gamedata['carte'] = Map.create(mapsize[0],mapsize[1])
+    gamedata['carte'] = None
     entities = {'Plante' : [], 'Carnivore' : [], 'Herbivore' : []}
     gamedata['entities'] = entities
-    for i in range(1, random.randint(1,nbcarnivore)):
-        gamedata = addCarnivore(gamedata, Carnivore.placement(gamedata), "?", 10)
-    for i in range(1, random.randint(1,nbherbivore)):
-        gamedata = addHerbivore(gamedata, Herbivore.placement(gamedata), "?", 10)
-    for i in range(1, random.randint(1,10)):
-        gamedata = addPlante(gamedata, "?", 10)
-
-    print(gamedata['entities'])
+    return gamedata
     
-def addPlante(gamedata : dict, skin : str, r_action : int):
-    gamedata['entities']['Plante'].append(Plante.create(skin, r_action, gamedata))
+def addPlante(gamedata : dict, position : tuple):
+    gamedata['entities']['Plante'].append(Plante.create(position))
     return gamedata
 
-def addCarnivore(gamedata : dict, position : tuple, skin : str, r_action : int) -> dict: 
-    gamedata['entities']['Carnivore'].append(Carnivore.create(position, skin, r_action))
+def addCarnivore(gamedata : dict, position : tuple) -> dict: 
+    gamedata['entities']['Carnivore'].append(Carnivore.create(position))
     return gamedata
 
-def addHerbivore(gamedata : dict, position : tuple, skin : str, r_action : int) -> dict:
-    gamedata['entities']['Herbivore'].append(Herbivore.create(position, skin, r_action))
+def addHerbivore(gamedata : dict, position : tuple) -> dict:
+    herbivore = Herbivore.create(position)
+    gamedata['entities']['Herbivore'].append(herbivore)
     return gamedata
 
 def get_allposition(gamedata : dict) -> list:
@@ -48,22 +43,15 @@ def get_allposition_nearby(gamedata : dict, position : tuple) -> list:
     return allpos
 
 def get_herbivore(gamedata : dict):
-    herbivore = []
-    for i in gamedata['entities']['Herbivore']:
-        herbivore.append(i)
-    return herbivore
+    return gamedata['entities']['Herbivore']
 
 def get_carnivore(gamedata : dict):
-    carnivore = []
-    for i in gamedata['entities']['Carnivore']:
-        carnivore.append(i)
-    return carnivore
+    return gamedata['entities']['Carnivore']
+  
 
 def get_plante(gamedata : dict):
-    plante = []
-    for i in gamedata['entities']['Plante']:
-        plante.append(i)
-    return plante
+    return gamedata['entities']['Plante']
+        
     
 def get_herbivore_position(gamedata : dict) -> list:
     position = []
@@ -83,7 +71,37 @@ def get_plante_position(gamedata : dict) -> list:
         position.append(i['position'])
     return position
 
+def kill_plante(gamedata : dict, plantetokill : int):
+    assert type(plantetokill) is int
+    gamedata['entities']['Plante'].pop(plantetokill)
+    return gamedata
+
+def kill_carnivore(gamedata : dict, carnivoretokill : int):
+    assert type(carnivoretokill) is int
+    gamedata['entities']['Carnivore'].pop(carnivoretokill)
+    return gamedata
+
+def kill_herbivore(gamedata : dict, herbivoretokill : int):
+    assert type(herbivoretokill) is int
+    gamedata['entities']['Herbivore'].pop(herbivoretokill)
+    return gamedata
+
 def distance(position1, position2):
-    return sqrt((position2[0]-position1[0])**2 +(position2[1]-position1[1])**2)
+    return math.sqrt((position2[0]-position1[0])**2 +(position2[1]-position1[1])**2)
 if __name__ == '__main__':
     game = create(1, 1, (10,10))
+
+def count_nearby_entities(gamedata, creature, thingtocount):
+    c = 0
+    if type(thingtocount[0]) is tuple:
+        for i in thingtocount:
+            if distance(creature['position'], i) == 1:
+                c += 1
+    elif type(thingtocount[0]) is dict:
+        for i in thingtocount:
+            if distance(creature['position'], i['position']) == 1:
+                c += 1
+    else:
+        print('error')
+        assert 'error'
+    return c

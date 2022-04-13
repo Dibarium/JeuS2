@@ -1,31 +1,20 @@
 import random
 import Gamedata
-def create(skin : str, r_action : int, gamedata : dict) -> dict():
-    assert type(gamedata) is dict
-    assert type(skin) is str
-    assert type(r_action) is int
-    
-    position = placement(gamedata)
-    return {"skin" : skin, 'position' : position, 'r_action' : r_action}
+import Map
+import sys
+def create(position : tuple) -> dict():
+    return {"skin" : "♣", 'position' : position}
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict
 
     return creature["skin"]
 
-def get_r_action(creature : dict) -> int:
-    assert type(creature) is dict
-
-    return creature['r_action']
-
 def get_position(creature : dict) -> tuple:
     assert type(creature) is dict
 
     return creature["position"]
     
-
-
-
 def set_skin(creature : dict, newskin : str) -> dict:
     assert type(creature) is dict
     assert type(newskin) is str
@@ -33,21 +22,40 @@ def set_skin(creature : dict, newskin : str) -> dict:
     creature['skin'] = newskin
     return creature
 
-def isdead(creature : dict, gamedata : dict):
-    pass
-
-def placement(gamedata : dict) -> tuple:
+def randomposition(gamedata : dict) -> tuple:
     assert type(gamedata) is dict
+    allposition = Gamedata.get_allposition(gamedata)
+    mapsize = Map.get_size(gamedata['carte'])
 
-    maplength = (len(gamedata['carte'][0]), len(gamedata['carte']))
-    allpos = Gamedata.get_allposition(gamedata)
     goodposition = False
     while goodposition != True:
-        newposition = (random.randint(0, maplength[0]), random.randint(0, maplength[1]))
-        if newposition not in allpos:
+        newposition = (random.randint(0, mapsize[0]-1), random.randint(0, mapsize[1]-1))
+        if valid_move(gamedata, allposition, newposition):
             goodposition = True
             return newposition
-    
+
+def isinmap(newposition : tuple, carte : list) -> bool:
+    """
+    Tells you if the position is inside the map
+    """
+    assert type(newposition) is tuple
+    assert type(carte) is list
+    lenghtmap = (len(carte[0])-1, len(carte)-1)
+    if newposition[0] >= 0 and newposition[0] <= lenghtmap[0] and newposition[1] >= 0 and newposition[1] <= lenghtmap[1] :
+        return True
+    else: 
+        return False 
+
+def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
+    """
+    Tells you if a move is possible or not
+    """
+    assert type(newposition) is tuple
+    assert type(allposition) is list
+    if newposition not in allposition and isinmap(newposition, gamedata['carte']) :
+        return True
+    else:
+        return False
 
 def show(creature):
     pass
