@@ -1,49 +1,47 @@
-""":
-Carte d'identitée de creature
-type : plante/animal
-regime : eau/plante/animal
-comportement : 
-"""
 import random
-def create():
-    creature = 'plante'
-    regime = random.choice(['eau','plante','animal'])
-    comportement = 'manger'
-    skin = "?"
-    color = random.randint(0,1000)
-    position = (random.randint(0,10),random.randint(0, 10))
-    return {'type' : creature , 'regime' : regime, 'comportement' : comportement, "skin" : skin, "color" : color, 'position' : position}
+import Gamedata
+import Map
+import sys
+def create(position : tuple) -> dict():
+    return {"skin" : "♣", 'position' : position}
 
-def get_type(creature : dict):
+def get_skin(creature : dict) -> str:
     assert type(creature) is dict
-    return creature["type"]
 
-def get_regime(creature : dict):
-    assert type(creature) is dict
-    return creature["regime"]
-
-def get_skin(creature : dict):
-    assert type(creature) is dict
     return creature["skin"]
 
-def get_color(creature : dict):
+def get_position(creature : dict) -> tuple:
     assert type(creature) is dict
-    return creature["color"]
 
-def get_position(creature : dict):
-    assert type(creature) is dict
     return creature["position"]
-
-def set_skin(creature : dict, newskin : str):
+    
+def set_skin(creature : dict, newskin : str) -> dict:
     assert type(creature) is dict
     assert type(newskin) is str
+
     creature['skin'] = newskin
     return creature
 
-def set_position(creature : dict, newposition):
-    creature['position'] = newposition
-    return creature
+def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
+    """
+    Tells you if a move is possible or not
+    """
+    assert type(newposition) is tuple
+    assert type(allposition) is list
+    if newposition not in allposition and isinmap(newposition, gamedata['carte']) :
+        return True
+    else:
+        return False
 
 def show(creature):
     pass
 
+if __name__ == "__main__":
+    gamedata = {
+    'carte' : [[] for i in range(0,10)], 
+    'entities' : {
+        'plante': [{'position' : (1,3)},{'position' : (3,4)}],
+        'carnivores': [{'position' : (1,2)}],
+        'herbivores': [{'position' : (5,2)}]}}
+    plante = create("?", 10, gamedata)
+    print(plante)

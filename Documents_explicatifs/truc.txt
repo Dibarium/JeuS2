@@ -1,0 +1,14 @@
+Les règles de notre simulation sont :
+	Générales : Il ne peut jamais y avoir 2 éléments sur la même case, donc lorsque la reproduction occure il faut une case de libre à proximité pour que le nouveau né apparaisse.
+	les herbivores : Ont pour but de se nourrir, se reproduire. Ils peuvent se déplacer dans les 4 directions cardinales, afin de se diriger vers la source de nourriture la plus proche. Ils peuvent se faire manger par les carnivores.
+	les carnivores : Ont pour but de manger les herbivores, et de se reproduire. Ils peuvent se déplacer dans les 4 directions cardinales, pour se diriger vers l'herbivore le plus proche. Ils disparaissent au bout 5sec si ils ne se sont pas nourrit.
+	les plantes : Elles apparaissent  aléatoirement sur la map.
+	Quand le jeu se termine, un écran de fin s'affiche.
+
+Piste d'amélioration :
+	Chaleur = apparition ?
+	Collision objet : Path finding
+	Cinématique
+	Barre de faim
+
+Les plantes sont statique, elles servent de nourriture pour les herbivores.
