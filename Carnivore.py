@@ -1,7 +1,8 @@
 import random
 import Gamedata
+import Map
 def create(position : tuple) -> dict:
-    skin = "?"
+    skin = "▲"
     return {"skin" : skin, 'position' : position, 'manger' : False}
 
 def get_skin(creature : dict) -> str:
@@ -22,6 +23,10 @@ def set_position(creature : dict, newposition) -> dict:
     """
     creature['position'] = newposition
     return creature
+
+def set_manger(creature : dict, etat : bool) -> dict :
+    creature["manger"] = etat
+    return creature 
 
 def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
@@ -76,64 +81,65 @@ def can_reproduce(creature, gamedata, allposition) -> bool:
     return True
 
 def reproduce(creature, gamedata, allposition) -> dict:
-    """place another herbivore around"""
+    """place another Carnivore around"""
     position = creature['position']
     nearbyposition = Gamedata.get_allposition_nearby(gamedata, position)
     for i in nearbyposition:
         if i not in allposition and Map.isinmap(i, gamedata['carte']):
-            gamedata = Gamedata.addHerbivore(gamedata, i)
+            gamedata = Gamedata.addCarnivore(gamedata, i)
             return gamedata
 
 def caneat(creature, gamedata) -> bool:
-    """return True if plante nearby""" 
-    plantepos = Gamedata.get_plante_position(gamedata)
-    if Gamedata.count_nearby_entities(gamedata, creature, plantepos) >= 1:
+    """return True if herbivore nearby""" 
+    herbivorepos = Gamedata.get_herbivore_position(gamedata)
+    if Gamedata.count_nearby_entities(gamedata, creature, herbivorepos) >= 1:
         return True
     return False
 
 def eat(creature, gamedata) -> dict:
-    """found plante nearby and pop it"""
-    plantes = Gamedata.get_plante(gamedata)
-    for i in range(len(plantes)):
-        if Gamedata.distance(plantes[i]['position'], creature['position']) == 1:
-            gamedata = Gamedata.kill_plante(gamedata, i)
+    """found herbivore nearby and pop it"""
+    herbivores = Gamedata.get_herbivore(gamedata)
+    for i in range(len(herbivores)):
+        if Gamedata.distance(herbivores[i]['position'], creature['position']) == 1:
+            gamedata = Gamedata.kill_herbivore(gamedata, i)
             return gamedata
 
 def gotofood(creature, gamedata, allposition) -> tuple:
-    plantepos = Gamedata.get_plante_position(gamedata)
+    herbivorepos = Gamedata.get_herbivore_position(gamedata)
     creaturepos = creature['position']
-    closestplante = (Gamedata.distance(creaturepos, plantepos[0]), plantepos[0])
-    for i in plantepos:
+    closestherbivore = (Gamedata.distance(creaturepos, herbivorepos[0]), herbivorepos[0])
+    for i in herbivorepos:
         distance = Gamedata.distance(creaturepos, i)
-        if distance < closestplante[0]:
-            closestplante = (distance,i)
+        if distance < closestherbivore[0]:
+            closestherbivore = (distance,i)
 
-    plantepos = closestplante[1]
-    if creaturepos[0] != plantepos[0] and creaturepos[1] != plantepos[1]:
+    herbivorepos = closestherbivore[1]
+    if creaturepos[0] != herbivorepos[0] and creaturepos[1] != herbivorepos[1]:
         i = random.randint(0,1)
         if i == 0:
-            if plantepos[0] > creaturepos[0]:
+            if herbivorepos[0] > creaturepos[0]:
                 return move(creature, gamedata, "Right", allposition)
             else:
                 return move(creature, gamedata, "Left", allposition)
         else :
-            if plantepos[1] > creaturepos[1]:
+            if herbivorepos[1] > creaturepos[1]:
                 return move(creature, gamedata, "Down", allposition)
             else:
                 return move(creature, gamedata, "Up", allposition)
 
-    elif creaturepos[1] != plantepos[1]:
-        if plantepos[1] > creaturepos[1]:
+    elif creaturepos[1] != herbivorepos[1]:
+        if herbivorepos[1] > creaturepos[1]:
             return move(creature, gamedata, "Down", allposition)
         else:
             return move(creature, gamedata, "Up", allposition)
 
-    elif creaturepos[0] != plantepos[0]:
-        if plantepos[0] > creaturepos[0]:
+    elif creaturepos[0] != herbivorepos[0]:
+        if herbivorepos[0] > creaturepos[0]:
             return move(creature, gamedata, "Right", allposition)
         else:
             return move(creature, gamedata, "Left", allposition)
-
+    else:
+        return creature
 if __name__ == "__main__":
     gamedata = {
     'carte' : [[[] for i in range(0,10)] for y in range(0,10)], 

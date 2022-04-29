@@ -12,27 +12,63 @@ import copy
 def init():
     gamedata = Gamedata.create()
     gamedata['carte'] = Map.create(100, 30)
-    for i in range(1):
+    numberofherbivore = 1
+    numberofplantes = 100
+    numberofcarnivore = 1
+    for i in range(numberofherbivore):
         validposition = Gamedata.randomposition(gamedata)
         gamedata = Gamedata.addHerbivore(gamedata, validposition)
-    for i in range(100):
+    for i in range(numberofplantes):
         validposition = Gamedata.randomposition(gamedata)
         gamedata = Gamedata.addPlante(gamedata, validposition)
+    for i in range(numberofcarnivore):
+        validposition = Gamedata.randomposition(gamedata)
+        gamedata = Gamedata.addCarnivore(gamedata, validposition)
+
     return gamedata
 
 def interract(gamedata, dt):
-    #Herbivore turn
+    #print("ooooooooooooo")
     allposition = Gamedata.get_allposition(gamedata)
+    #Carnivore turn
+    countcarnivore = 0
+    for i in Gamedata.get_carnivore(gamedata):
+        #print("-------------------")
+        #print(i)
+        if Carnivore.get_manger(i) == True:
+            #reproduction
+            if Carnivore.can_reproduce(i, gamedata, allposition):
+                #print("se reproduit")
+                gamedata = Carnivore.reproduce(i, gamedata, allposition)
+                allposition = Gamedata.get_allposition(gamedata)
+                i = Carnivore.set_manger(i, False)
+                #print(i)
+        else:
+            #Manger
+            if Gamedata.get_herbivore(gamedata) != []:
+                if Carnivore.caneat(i, gamedata) == True:
+                    #print("peut manger")
+                    gamedata = Carnivore.eat(i, gamedata)
+                    allposition = Gamedata.get_allposition(gamedata)
+                    i = Carnivore.set_manger(i, True)
+                    
+                else:
+                    #Chercher à manger et y aller
+                    #print("se dirige vers le manger")
+                    i = Carnivore.gotofood(i,gamedata, allposition)
+        gamedata['entities']['Carnivore'][countcarnivore] = i
+        countcarnivore +=1
+        #print(i)
+        
+
+
+    #Herbivore turn
     countherbivore = 0
     for i in Gamedata.get_herbivore(gamedata):
-        #print("---------------------")
-        #print(countherbivore)
-        #print(i)
         if Herbivore.get_manger(i) == True:
-            #Reproduction
-            #print("reproduction")
+            #reproduction
             if Herbivore.can_reproduce(i, gamedata, allposition):
-                Herbivore.reproduce(i, gamedata, allposition)
+                gamedata = Herbivore.reproduce(i, gamedata, allposition)
                 allposition = Gamedata.get_allposition(gamedata)
                 i = Herbivore.set_manger(i, False)
         else:
@@ -51,6 +87,8 @@ def interract(gamedata, dt):
         #print(i)
         gamedata['entities']['Herbivore'][countherbivore] = i
         countherbivore +=1
+
+
     return gamedata
         
 def show(gamedata) -> None:
@@ -59,16 +97,18 @@ def show(gamedata) -> None:
         newcarte[i['position'][1]][i['position'][0]] = i['skin']
     for i in Gamedata.get_plante(gamedata):
         newcarte[i['position'][1]][i['position'][0]] = i['skin']
+    for i in Gamedata.get_carnivore(gamedata):
+        newcarte[i['position'][1]][i['position'][0]] = i['skin']
     Map.show(newcarte)
-    time.sleep(0.5)
+    time.sleep(0.2)
         
     
 
-def run ():
+def run(gamedata):
     os.system("clear")
     print("CHARGEMENT...")
     
-    gamedata = init()
+    
     start_time = time.time()
     dt = time.time() - start_time
     while dt < 100:
@@ -76,5 +116,9 @@ def run ():
         show(gamedata)
         dt = time.time() - start_time
 
+def main():
+    gamedata = init()
+    run(gamedata)
+    
 if __name__ == "__main__":
-    run()
+    main()

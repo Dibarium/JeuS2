@@ -17,7 +17,8 @@ def addPlante(gamedata : dict, position : tuple):
     return gamedata
 
 def addCarnivore(gamedata : dict, position : tuple) -> dict: 
-    gamedata['entities']['Carnivore'].append(Carnivore.create(position))
+    carnivore = Carnivore.create(position)
+    gamedata['entities']['Carnivore'].append(carnivore)
     return gamedata
 
 def addHerbivore(gamedata : dict, position : tuple) -> dict:
@@ -36,10 +37,9 @@ def get_allposition(gamedata : dict) -> list:
 
 def get_allposition_nearby(gamedata : dict, position : tuple) -> list:
     allpos = []
-    allpos.append((position[0]+1,position[1]))
-    allpos.append((position[0]-1,position[1]))
-    allpos.append((position[0],position[1]+1))
-    allpos.append((position[0],position[1]-1))
+    for y in range(-1,2):
+        for x in range(-1,2):
+            allpos.append((position[0]+x,position[1]+y))
     return allpos
 
 def get_herbivore(gamedata : dict):
@@ -48,11 +48,9 @@ def get_herbivore(gamedata : dict):
 def get_carnivore(gamedata : dict):
     return gamedata['entities']['Carnivore']
   
-
 def get_plante(gamedata : dict):
     return gamedata['entities']['Plante']
         
-    
 def get_herbivore_position(gamedata : dict) -> list:
     position = []
     for i in gamedata['entities']['Herbivore']:
@@ -97,13 +95,6 @@ def count_nearby_entities(gamedata, creature, thingtocount):
         for i in thingtocount:
             if distance(creature['position'], i) == 1:
                 c += 1
-    elif type(thingtocount[0]) is dict:
-        for i in thingtocount:
-            if distance(creature['position'], i['position']) == 1:
-                c += 1
-    else:
-        print('error')
-        assert 'error'
     return c
 
 def randomposition(gamedata : dict) -> tuple:
