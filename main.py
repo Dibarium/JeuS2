@@ -9,15 +9,14 @@ import copy
 # truc comme ça :
 # gamedata = {'entities' : {'plante': [{'position' : (1,3)},{'position' : (3,4)}, {'position' : (1,0)}],'carnivores': [{'position' : (1,2)}],'herbivores': [{'position' : (5,2)}]}}
 
-
 def init():
     gamedata = Gamedata.create()
     gamedata['carte'] = Map.create(100, 30)
     for i in range(1):
-        validposition = Herbivore.randomposition(gamedata)
+        validposition = Gamedata.randomposition(gamedata)
         gamedata = Gamedata.addHerbivore(gamedata, validposition)
     for i in range(100):
-        validposition = Plante.randomposition(gamedata)
+        validposition = Gamedata.randomposition(gamedata)
         gamedata = Gamedata.addPlante(gamedata, validposition)
     return gamedata
 

@@ -33,6 +33,18 @@ def show(carte):
           #print("showmap")
           sys.stdout.write(carte[y-1][x-1])
 
+def isinmap(newposition : tuple, carte : list) -> bool:
+    """
+    Tells you if the position is inside the map
+    """
+    assert type(newposition) is tuple
+    assert type(carte) is list
+    lenghtmap = (len(carte[0])-1, len(carte)-1)
+    if newposition[0] >= 0 and newposition[0] <= lenghtmap[0] and newposition[1] >= 0 and newposition[1] <= lenghtmap[1] :
+        return True
+    else: 
+        return False
+
 if __name__ == "__main__":
   map = create(50, 50)
   show(map)

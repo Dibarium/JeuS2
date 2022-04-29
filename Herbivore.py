@@ -35,31 +35,7 @@ def set_position(creature : dict, newposition) -> dict:
 
 def set_manger(creature : dict, etat : bool) -> dict :
     creature["manger"] = etat
-    return creature
-
-def randomposition(gamedata : dict) -> tuple:
-    assert type(gamedata) is dict
-    allposition = Gamedata.get_allposition(gamedata)
-    mapsize = Map.get_size(gamedata['carte'])
-
-    goodposition = False
-    while goodposition != True:
-        newposition = (random.randint(0, mapsize[0]-1), random.randint(0, mapsize[1]-1))
-        if valid_move(gamedata, allposition, newposition):
-            goodposition = True
-            return newposition
-
-def isinmap(newposition : tuple, carte : list) -> bool:
-    """
-    Tells you if the position is inside the map
-    """
-    assert type(newposition) is tuple
-    assert type(carte) is list
-    lenghtmap = (len(carte[0])-1, len(carte)-1)
-    if newposition[0] >= 0 and newposition[0] <= lenghtmap[0] and newposition[1] >= 0 and newposition[1] <= lenghtmap[1] :
-        return True
-    else: 
-        return False 
+    return creature 
 
 def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
@@ -67,7 +43,7 @@ def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
     assert type(newposition) is tuple
     assert type(allposition) is list
-    if newposition not in allposition and isinmap(newposition, gamedata['carte']) :
+    if newposition not in allposition and Map.isinmap(newposition, gamedata['carte']) :
         return True
     else:
         return False
@@ -120,7 +96,7 @@ def reproduce(creature, gamedata, allposition) -> dict:
     position = creature['position']
     nearbyposition = Gamedata.get_allposition_nearby(gamedata, position)
     for i in nearbyposition:
-        if i not in allposition and isinmap(i, gamedata['carte']):
+        if i not in allposition and Map.isinmap(i, gamedata['carte']):
             gamedata = Gamedata.addHerbivore(gamedata, i)
             return gamedata
 

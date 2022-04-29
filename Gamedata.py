@@ -105,3 +105,15 @@ def count_nearby_entities(gamedata, creature, thingtocount):
         print('error')
         assert 'error'
     return c
+
+def randomposition(gamedata : dict) -> tuple:
+    assert type(gamedata) is dict
+    allposition = get_allposition(gamedata)
+    mapsize = Map.get_size(gamedata['carte'])
+
+    goodposition = False
+    while goodposition != True:
+        newposition = (random.randint(0, mapsize[0]-1), random.randint(0, mapsize[1]-1))
+        if Herbivore.valid_move(gamedata, allposition, newposition):
+            goodposition = True
+            return newposition
