@@ -6,6 +6,7 @@ import Map
 import os
 import time
 import copy
+import random
 # truc comme ça :
 # gamedata = {'entities' : {'plante': [{'position' : (1,3)},{'position' : (3,4)}, {'position' : (1,0)}],'carnivores': [{'position' : (1,2)}],'herbivores': [{'position' : (5,2)}]}}
 
@@ -39,7 +40,7 @@ def interract(gamedata, dt):
             #reproduction
             if Carnivore.can_reproduce(i, gamedata, allposition):
                 #print("se reproduit")
-                gamedata = Carnivore.reproduce(i, gamedata, allposition)
+                Carnivore.reproduce(i, gamedata, allposition)
                 allposition = Gamedata.get_allposition(gamedata)
                 i = Carnivore.set_manger(i, False)
                 #print(i)
@@ -48,7 +49,7 @@ def interract(gamedata, dt):
             if Gamedata.get_herbivore(gamedata) != []:
                 if Carnivore.caneat(i, gamedata) == True:
                     #print("peut manger")
-                    gamedata = Carnivore.eat(i, gamedata)
+                    Carnivore.eat(i, gamedata)
                     allposition = Gamedata.get_allposition(gamedata)
                     i = Carnivore.set_manger(i, True)
                     
@@ -59,7 +60,7 @@ def interract(gamedata, dt):
         gamedata['entities']['Carnivore'][countcarnivore] = i
         countcarnivore +=1
         #print(i)
-        
+    
 
 
     #Herbivore turn
@@ -68,7 +69,7 @@ def interract(gamedata, dt):
         if Herbivore.get_manger(i) == True:
             #reproduction
             if Herbivore.can_reproduce(i, gamedata, allposition):
-                gamedata = Herbivore.reproduce(i, gamedata, allposition)
+                Herbivore.reproduce(i, gamedata, allposition)
                 allposition = Gamedata.get_allposition(gamedata)
                 i = Herbivore.set_manger(i, False)
         else:
@@ -88,19 +89,24 @@ def interract(gamedata, dt):
         gamedata['entities']['Herbivore'][countherbivore] = i
         countherbivore +=1
 
+        #Nouvelles plantes
+        if int(dt)%10 == 1:
+            for i in range(random.randint(0,1)):
+                plante = Gamedata.randomposition(gamedata)
+                gamedata = Gamedata.addPlante(gamedata, plante)
 
     return gamedata
         
 def show(gamedata) -> None:
     newcarte = copy.deepcopy(gamedata['carte'])
     for i in Gamedata.get_herbivore(gamedata):
-        newcarte[i['position'][1]][i['position'][0]] = i['skin']
+        newcarte[i['position'][1]][i['position'][0]] = [i['skin'], i['color']]
     for i in Gamedata.get_plante(gamedata):
-        newcarte[i['position'][1]][i['position'][0]] = i['skin']
+        newcarte[i['position'][1]][i['position'][0]] = [i['skin'], i['color']]
     for i in Gamedata.get_carnivore(gamedata):
-        newcarte[i['position'][1]][i['position'][0]] = i['skin']
+        newcarte[i['position'][1]][i['position'][0]] = [i['skin'], i['color']]
     Map.show(newcarte)
-    time.sleep(0.2)
+    #time.sleep(0.2)
         
     
 

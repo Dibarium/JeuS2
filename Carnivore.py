@@ -2,8 +2,9 @@ import random
 import Gamedata
 import Map
 def create(position : tuple) -> dict:
+    assert type(position) is tuple
     skin = "▲"
-    return {"skin" : skin, 'position' : position, 'manger' : False}
+    return {"skin" : skin, 'position' : position, 'manger' : False, "color" : '31'}
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict
@@ -17,14 +18,18 @@ def get_manger(creature : dict) -> bool:
     assert type(creature) is dict
     return creature['manger']
 
-def set_position(creature : dict, newposition) -> dict:
+def set_position(creature : dict, newposition : tuple) -> dict:
     """
     Return a dict with new position
     """
+    assert type(creature) is dict
+    assert type(newposition) is tuple
     creature['position'] = newposition
     return creature
 
 def set_manger(creature : dict, etat : bool) -> dict :
+    assert type(creature) is dict
+    assert type(etat) is bool
     creature["manger"] = etat
     return creature 
 
@@ -32,6 +37,7 @@ def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
     Tells you if a move is possible or not
     """
+    assert type(gamedata) is dict
     assert type(newposition) is tuple
     assert type(allposition) is list
     if newposition not in allposition and Map.isinmap(newposition, gamedata['carte']) :
@@ -39,8 +45,12 @@ def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     else:
         return False
 
-def move(creature : dict, gamedata : dict, direction : str, allposition : list()) -> dict:
+def move(creature : dict, gamedata : dict, direction : str, allposition : list) -> dict:
     """Move character"""
+    assert type(creature) is dict
+    assert type(gamedata) is dict
+    assert type(direction) is str
+    assert type(allposition) is list
     actualposition = creature['position']
 
     if direction == 'Down':
@@ -74,14 +84,20 @@ def move(creature : dict, gamedata : dict, direction : str, allposition : list()
         print('error')
         assert 'pasdemove'
 
-def can_reproduce(creature, gamedata, allposition) -> bool:
+def can_reproduce(creature : dict, gamedata : dict, allposition : list) -> bool:
     """return True if there's room"""
+    assert type(creature) is dict
+    assert type(gamedata) is dict
+    assert type(allposition) is list
     if Gamedata.count_nearby_entities(gamedata, creature, allposition) == 8:
         return False
     return True
 
 def reproduce(creature, gamedata, allposition) -> dict:
     """place another Carnivore around"""
+    assert type(creature) is dict
+    assert type(gamedata) is dict
+    assert type(allposition) is list
     position = creature['position']
     nearbyposition = Gamedata.get_allposition_nearby(gamedata, position)
     for i in nearbyposition:
@@ -91,6 +107,8 @@ def reproduce(creature, gamedata, allposition) -> dict:
 
 def caneat(creature, gamedata) -> bool:
     """return True if herbivore nearby""" 
+    assert type(creature) is dict
+    assert type(gamedata) is dict
     herbivorepos = Gamedata.get_herbivore_position(gamedata)
     if Gamedata.count_nearby_entities(gamedata, creature, herbivorepos) >= 1:
         return True
@@ -98,6 +116,8 @@ def caneat(creature, gamedata) -> bool:
 
 def eat(creature, gamedata) -> dict:
     """found herbivore nearby and pop it"""
+    assert type(creature) is dict
+    assert type(gamedata) is dict
     herbivores = Gamedata.get_herbivore(gamedata)
     for i in range(len(herbivores)):
         if Gamedata.distance(herbivores[i]['position'], creature['position']) == 1:
@@ -105,6 +125,9 @@ def eat(creature, gamedata) -> dict:
             return gamedata
 
 def gotofood(creature, gamedata, allposition) -> tuple:
+    assert type(creature) is dict
+    assert type(gamedata) is dict
+    assert type(allposition) is list
     herbivorepos = Gamedata.get_herbivore_position(gamedata)
     creaturepos = creature['position']
     closestherbivore = (Gamedata.distance(creaturepos, herbivorepos[0]), herbivorepos[0])

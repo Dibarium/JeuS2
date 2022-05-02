@@ -23,7 +23,9 @@ def show(carte):
         #print(x," ",y)
         s="\033["+str(y+1)+";"+str(x+1)+"H"
         sys.stdout.write(s)
+
         if y == 0 or y == mapsize[1]+1:
+          pass
           #print("upborder")
           sys.stdout.write("▓")
         elif x == 0 or x == mapsize[0]+1:
@@ -31,7 +33,13 @@ def show(carte):
           sys.stdout.write("▓")
         else:
           #print("showmap")
-          sys.stdout.write(carte[y-1][x-1])
+          #os.system("clear")
+          if type(carte[y-1][x-1]) is list:
+            color = carte[y-1][x-1][1]
+            character = carte[y-1][x-1][0]
+            sys.stdout.write(u"\u001b["+ color + "m" + character +"\u001b[0m")
+          else :
+            sys.stdout.write(" ")
 
 def isinmap(newposition : tuple, carte : list) -> bool:
     """
