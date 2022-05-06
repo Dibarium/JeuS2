@@ -6,7 +6,15 @@ import os
 
 def create(position : tuple) -> dict:
     skin = "■"
-    return {"skin" : skin, 'position' : position, 'manger' : False, "color" : '34'}
+    return {"skin" : skin, 'position' : position, 'manger' : False, "color" : '34', "last_eat" : 10, "max_last_eat" : 10}
+
+def get_last_eat(creature : dict) -> int:
+    assert type(creature) is dict
+    return creature["last_eat"]
+
+def get_max_last_eat(creature : dict) -> int:
+    assert type(creature) is dict
+    return creature["max_last_eat"]
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict
@@ -40,6 +48,11 @@ def set_manger(creature : dict, etat : bool) -> dict :
     assert type(etat) is bool
     creature["manger"] = etat
     return creature 
+
+def set_last_eat(creature, value):
+    assert type(creature) is dict
+    creature["last_eat"] = value
+    return creature
 
 def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
     """
@@ -172,7 +185,16 @@ def gotofood(creature, gamedata, allposition) -> tuple:
         else:
             return move(creature, gamedata, "Left", allposition)
     
-        
+def isdead(creature : dict) -> bool:
+    assert type(creature) is dict
+    if get_last_eat(creature) <= 0:
+        return True
+    return False
+
+def reset_time_eat(creature : dict) -> dict:
+    assert type(creature) is dict
+    creature = set_last_eat(creature, creature["max_last_eat"])
+    return creature       
         
 
 def show(creature):

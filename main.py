@@ -13,9 +13,9 @@ import random
 def init():
     gamedata = Gamedata.create()
     gamedata['carte'] = Map.create(100, 30)
-    numberofherbivore = 1
-    numberofplantes = 100
-    numberofcarnivore = 1
+    numberofherbivore = 6
+    numberofplantes = 200
+    numberofcarnivore = 5
     for i in range(numberofherbivore):
         validposition = Gamedata.randomposition(gamedata)
         gamedata = Gamedata.addHerbivore(gamedata, validposition)
@@ -28,72 +28,87 @@ def init():
 
     return gamedata
 
-def interract(gamedata, dt):
+def interract(gamedata, generation):
     #print("ooooooooooooo")
-    allposition = Gamedata.get_allposition(gamedata)
-    #Carnivore turn
-    countcarnivore = 0
-    for i in Gamedata.get_carnivore(gamedata):
-        #print("-------------------")
-        #print(i)
-        if Carnivore.get_manger(i) == True:
-            #reproduction
-            if Carnivore.can_reproduce(i, gamedata, allposition):
-                #print("se reproduit")
-                Carnivore.reproduce(i, gamedata, allposition)
+    if generation%3 == 0:
+        allposition = Gamedata.get_allposition(gamedata)
+        #Carnivore turn
+        countcarnivore = 0
+        for i in Gamedata.get_carnivore(gamedata):
+            #print("-------------------")
+            #print(i)
+            Carnivore.set_last_eat(i, Carnivore.get_last_eat(i)-1)
+            if Carnivore.isdead(i):
+                Gamedata.kill_carnivore(gamedata, countcarnivore)
                 allposition = Gamedata.get_allposition(gamedata)
-                i = Carnivore.set_manger(i, False)
-                #print(i)
-        else:
-            #Manger
-            if Gamedata.get_herbivore(gamedata) != []:
-                if Carnivore.caneat(i, gamedata) == True:
-                    #print("peut manger")
-                    Carnivore.eat(i, gamedata)
-                    allposition = Gamedata.get_allposition(gamedata)
-                    i = Carnivore.set_manger(i, True)
-                    
+            else:
+                if Carnivore.get_manger(i) == True:
+                    #reproduction
+                    if Carnivore.can_reproduce(i, gamedata, allposition):
+                        #print("se reproduit")
+                        Carnivore.reproduce(i, gamedata, allposition)
+                        allposition = Gamedata.get_allposition(gamedata)
+                        i = Carnivore.set_manger(i, False)
+                        #print(i)
                 else:
-                    #Chercher à manger et y aller
-                    #print("se dirige vers le manger")
-                    i = Carnivore.gotofood(i,gamedata, allposition)
-        gamedata['entities']['Carnivore'][countcarnivore] = i
-        countcarnivore +=1
+                    #Manger
+                    if Gamedata.get_herbivore(gamedata) != []:
+                        if Carnivore.caneat(i, gamedata) == True:
+                            #print("peut manger")
+                            Carnivore.eat(i, gamedata)
+                            i = Carnivore.reset_time_eat(i)
+                            allposition = Gamedata.get_allposition(gamedata)
+                            i = Carnivore.set_manger(i, True)
+                            
+                        else:
+                            #Chercher à manger et y aller
+                            #print("se dirige vers le manger")
+                            i = Carnivore.gotofood(i,gamedata, allposition)
+                gamedata['entities']['Carnivore'][countcarnivore] = i
+            countcarnivore +=1
         #print(i)
     
 
 
     #Herbivore turn
-    countherbivore = 0
-    for i in Gamedata.get_herbivore(gamedata):
-        if Herbivore.get_manger(i) == True:
-            #reproduction
-            if Herbivore.can_reproduce(i, gamedata, allposition):
-                Herbivore.reproduce(i, gamedata, allposition)
+    if generation%3 == 0:
+        allposition = Gamedata.get_allposition(gamedata)
+        countherbivore = 0
+        for i in Gamedata.get_herbivore(gamedata):
+            Herbivore.set_last_eat(i, Herbivore.get_last_eat(i)-1)
+            if Herbivore.isdead(i):
+                Gamedata.kill_herbivore(gamedata, countherbivore)
                 allposition = Gamedata.get_allposition(gamedata)
-                i = Herbivore.set_manger(i, False)
-        else:
-            #Manger
-            if Gamedata.get_plante(gamedata) != []:
-                if Herbivore.caneat(i, gamedata) == True:
-                    #print("peut manger")
-                    gamedata = Herbivore.eat(i, gamedata)
-                    allposition = Gamedata.get_allposition(gamedata)
-                    i = Herbivore.set_manger(i, True)
-
+            else:
+                if Herbivore.get_manger(i) == True:
+                    #reproduction
+                    if Herbivore.can_reproduce(i, gamedata, allposition):
+                        Herbivore.reproduce(i, gamedata, allposition)
+                        allposition = Gamedata.get_allposition(gamedata)
+                        i = Herbivore.set_manger(i, False)
                 else:
-                    #Chercher à manger et y aller
-                    #print("aller vers manger")
-                    i = Herbivore.gotofood(i,gamedata, allposition)
-        #print(i)
-        gamedata['entities']['Herbivore'][countherbivore] = i
-        countherbivore +=1
+                    #Manger
+                    if Gamedata.get_plante(gamedata) != []:
+                        if Herbivore.caneat(i, gamedata) == True:
+                            #print("peut manger")
+                            i = Herbivore.set_last_eat(i, i["max_last_eat"])
+                            gamedata = Herbivore.eat(i, gamedata)
+                            allposition = Gamedata.get_allposition(gamedata)
+                            i = Herbivore.set_manger(i, True)
+
+                        else:
+                            #Chercher à manger et y aller
+                            #print("aller vers manger")
+                            i = Herbivore.gotofood(i,gamedata, allposition)
+                #print(i)
+                gamedata['entities']['Herbivore'][countherbivore] = i
+            countherbivore +=1
 
         #Nouvelles plantes
-        if int(dt)%10 == 1:
-            for i in range(random.randint(0,1)):
-                plante = Gamedata.randomposition(gamedata)
-                gamedata = Gamedata.addPlante(gamedata, plante)
+    if generation%10 == 1:
+        for i in range(random.randint(5,40)):
+            plante = Gamedata.randomposition(gamedata)
+            gamedata = Gamedata.addPlante(gamedata, plante)
 
     return gamedata
         
@@ -115,12 +130,11 @@ def run(gamedata):
     print("CHARGEMENT...")
     
     
-    start_time = time.time()
-    dt = time.time() - start_time
-    while dt < 100:
-        gamedata = interract(gamedata, dt)
+    generation = 0
+    while generation < 10000:
+        gamedata = interract(gamedata, generation)
         show(gamedata)
-        dt = time.time() - start_time
+        generation += 1
 
 def main():
     gamedata = init()
