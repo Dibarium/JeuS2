@@ -3,7 +3,7 @@ import Gamedata
 import Map
 import sys
 def create(position : tuple) -> dict():
-    return {"skin" : "♣", 'position' : position}
+    return {"skin" : "♣", 'position' : position, "color" : '32'}
 
 def get_skin(creature : dict) -> str:
     assert type(creature) is dict
@@ -18,14 +18,15 @@ def get_position(creature : dict) -> tuple:
 def set_skin(creature : dict, newskin : str) -> dict:
     assert type(creature) is dict
     assert type(newskin) is str
-
+    
     creature['skin'] = newskin
     return creature
 
-def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> dict:
+def valid_move(gamedata: dict, allposition : list, newposition : tuple) -> bool:
     """
     Tells you if a move is possible or not
     """
+    assert type(gamedata) is dict
     assert type(newposition) is tuple
     assert type(allposition) is list
     if newposition not in allposition and isinmap(newposition, gamedata['carte']) :

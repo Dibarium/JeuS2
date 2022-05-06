@@ -13,14 +13,21 @@ def create() -> dict:
     return gamedata
     
 def addPlante(gamedata : dict, position : tuple):
+    assert type(gamedata) is dict
+    assert type(position) is tuple
     gamedata['entities']['Plante'].append(Plante.create(position))
     return gamedata
 
 def addCarnivore(gamedata : dict, position : tuple) -> dict: 
-    gamedata['entities']['Carnivore'].append(Carnivore.create(position))
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    carnivore = Carnivore.create(position)
+    gamedata['entities']['Carnivore'].append(carnivore)
     return gamedata
 
 def addHerbivore(gamedata : dict, position : tuple) -> dict:
+    assert type(gamedata) is dict
+    assert type(position) is tuple
     herbivore = Herbivore.create(position)
     gamedata['entities']['Herbivore'].append(herbivore)
     return gamedata
@@ -35,43 +42,49 @@ def get_allposition(gamedata : dict) -> list:
     return position
 
 def get_allposition_nearby(gamedata : dict, position : tuple) -> list:
+    assert type(gamedata) is dict
+    assert type(position) is tuple
     allpos = []
-    allpos.append((position[0]+1,position[1]))
-    allpos.append((position[0]-1,position[1]))
-    allpos.append((position[0],position[1]+1))
-    allpos.append((position[0],position[1]-1))
+    for y in range(-1,2):
+        for x in range(-1,2):
+            allpos.append((position[0]+x,position[1]+y))
     return allpos
 
 def get_herbivore(gamedata : dict):
+    assert type(gamedata) is dict
     return gamedata['entities']['Herbivore']
 
 def get_carnivore(gamedata : dict):
+    assert type(gamedata) is dict
     return gamedata['entities']['Carnivore']
   
-
 def get_plante(gamedata : dict):
+    assert type(gamedata) is dict
     return gamedata['entities']['Plante']
         
-    
 def get_herbivore_position(gamedata : dict) -> list:
+    assert type(gamedata) is dict
     position = []
     for i in gamedata['entities']['Herbivore']:
         position.append(i['position'])
     return position
 
 def get_carnivore_position(gamedata : dict) -> list:
+    assert type(gamedata) is dict
     position = []
     for i in gamedata['entities']['Carnivore']:
         position.append(i['position'])
     return position
 
 def get_plante_position(gamedata : dict) -> list:
+    assert type(gamedata) is dict
     position = []
     for i in gamedata['entities']['Plante']:
         position.append(i['position'])
     return position
 
 def kill_plante(gamedata : dict, plantetokill : int):
+    assert type(gamedata) is dict
     assert type(plantetokill) is int
     gamedata['entities']['Plante'].pop(plantetokill)
     return gamedata
@@ -87,23 +100,20 @@ def kill_herbivore(gamedata : dict, herbivoretokill : int):
     return gamedata
 
 def distance(position1, position2):
+    assert type(position1) is tuple
+    assert type(position2) is tuple
     return math.sqrt((position2[0]-position1[0])**2 +(position2[1]-position1[1])**2)
 if __name__ == '__main__':
     game = create(1, 1, (10,10))
 
 def count_nearby_entities(gamedata, creature, thingtocount):
+    assert type(gamedata) is dict
+    assert type(creature) is dict
     c = 0
     if type(thingtocount[0]) is tuple:
         for i in thingtocount:
             if distance(creature['position'], i) == 1:
                 c += 1
-    elif type(thingtocount[0]) is dict:
-        for i in thingtocount:
-            if distance(creature['position'], i['position']) == 1:
-                c += 1
-    else:
-        print('error')
-        assert 'error'
     return c
 
 def randomposition(gamedata : dict) -> tuple:
