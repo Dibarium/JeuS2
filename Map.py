@@ -40,6 +40,7 @@ def show(carte):
             sys.stdout.write(u"\u001b["+ color + "m" + character +"\u001b[0m")
           else :
             sys.stdout.write(" ")
+  sys.stdout.flush()
 
 def isinmap(newposition : tuple, carte : list) -> bool:
     """

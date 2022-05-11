@@ -10,26 +10,12 @@ def create() -> dict:
     gamedata['carte'] = None
     entities = {'Plante' : [], 'Carnivore' : [], 'Herbivore' : []}
     gamedata['entities'] = entities
-    return gamedata
-    
-def addPlante(gamedata : dict, position : tuple):
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    gamedata['entities']['Plante'].append(Plante.create(position))
+    gamedata["currentstate"] = {"Start" : True, "Help" : False, "Play" : False}
     return gamedata
 
-def addCarnivore(gamedata : dict, position : tuple) -> dict: 
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    carnivore = Carnivore.create(position)
-    gamedata['entities']['Carnivore'].append(carnivore)
-    return gamedata
 
-def addHerbivore(gamedata : dict, position : tuple) -> dict:
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    herbivore = Herbivore.create(position)
-    gamedata['entities']['Herbivore'].append(herbivore)
+def set_currentstate(gamedata : dict, keyword : str, newvalue : bool)-> dict:
+    gamedata["currentstate"][keyword] = newvalue
     return gamedata
 
 def get_allposition(gamedata : dict) -> list:
@@ -82,6 +68,32 @@ def get_plante_position(gamedata : dict) -> list:
     for i in gamedata['entities']['Plante']:
         position.append(i['position'])
     return position
+
+def get_currentstate(gamedata : dict) -> dict:
+    for i in gamedata["currentstate"]:
+        if gamedata["currentstate"][i] == True:
+            return i
+    
+
+def addPlante(gamedata : dict, position : tuple):
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    gamedata['entities']['Plante'].append(Plante.create(position))
+    return gamedata
+
+def addCarnivore(gamedata : dict, position : tuple) -> dict: 
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    carnivore = Carnivore.create(position)
+    gamedata['entities']['Carnivore'].append(carnivore)
+    return gamedata
+
+def addHerbivore(gamedata : dict, position : tuple) -> dict:
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    herbivore = Herbivore.create(position)
+    gamedata['entities']['Herbivore'].append(herbivore)
+    return gamedata
 
 def kill_plante(gamedata : dict, plantetokill : int):
     assert type(gamedata) is dict
