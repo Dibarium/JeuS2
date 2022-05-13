@@ -10,12 +10,24 @@ def create() -> dict:
     gamedata['carte'] = None
     entities = {'Plante' : [], 'Carnivore' : [], 'Herbivore' : []}
     gamedata['entities'] = entities
-    gamedata["currentstate"] = {"Start" : True, "Help" : False, "Play" : False}
+    gamedata["currentstate"] = {"Start" : True, "Parametrage" : False, "Help" : False, "Play" : False}
+    gamedata["since_last_generation"] = 0
     return gamedata
 
+def get_since_last_generation(gamedata):
+    return gamedata["since_last_generation"]
 
-def set_currentstate(gamedata : dict, keyword : str, newvalue : bool)-> dict:
-    gamedata["currentstate"][keyword] = newvalue
+def set_since_last_generation(gamedata : dict, newvalue : int):
+    gamedata["since_last_generation"] = newvalue
+    return gamedata
+
+def set_currentstate(gamedata : dict, newstate : str, newvalue : bool)-> dict:
+    gamedata["currentstate"][newstate] = newvalue
+    return gamedata
+
+def change_currentstate(gamedata : dict,currentstate: str , newstate : str):
+    gamedata = set_currentstate(gamedata, newstate, True)
+    gamedata = set_currentstate(gamedata, currentstate, False)
     return gamedata
 
 def get_allposition(gamedata : dict) -> list:

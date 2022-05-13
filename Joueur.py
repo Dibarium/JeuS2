@@ -13,6 +13,7 @@ def get_key():
     if isData():
         c = sys.stdin.read(1)
         return c
+        #return repr(c)
 
 if __name__ == "__main__":
     old_settings = termios.tcgetattr(sys.stdin)
