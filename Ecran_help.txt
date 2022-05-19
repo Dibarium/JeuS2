@@ -1,0 +1,19 @@
+
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+▲ = Stabber, il s'agit d'une bactérie qui se nourrit des Grubbies, 
+            son but est de survivre et de se reproduire pour faire perdurer son espèce le plus longtemps possible.
+
+
+■ = Grubby, il s'agit d'une bactérie qui se nourrit de matières organiques, son but est de survivre aux attaques 
+            perputuelles des Stabber et de se reproduire afin de faire perdurer leur espèce le plus longtemps possible.
+
+
+♣ = Matières organiques, elle apparait de façon aléatoire sur la carte, elle permet aux Grubbies de se nourrir.
+
+Bon jeu !
+
+[Press escape] pour retourner au menu principal.
+
+------------------------------------------------------------------------------------------------------------------------------------------

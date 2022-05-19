@@ -5,31 +5,33 @@ import Map
 import random
 import math
 
-def create() -> dict:
+def create(State) -> dict:
     gamedata = dict()
     gamedata['carte'] = None
     entities = {'Plante' : [], 'Carnivore' : [], 'Herbivore' : []}
     gamedata['entities'] = entities
-    return gamedata
+    gamedata["currentstate"] = {"Start" : False, "Parametrage" : False, "Help" : False, "Play" : False, "End" : False}
+    gamedata["since_last_generation"] = 0
+    for i in gamedata["currentstate"]:
+        if i == State:
+            gamedata["currentstate"][i] = True
     
-def addPlante(gamedata : dict, position : tuple):
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    gamedata['entities']['Plante'].append(Plante.create(position))
     return gamedata
 
-def addCarnivore(gamedata : dict, position : tuple) -> dict: 
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    carnivore = Carnivore.create(position)
-    gamedata['entities']['Carnivore'].append(carnivore)
+def get_since_last_generation(gamedata):
+    return gamedata["since_last_generation"]
+
+def set_since_last_generation(gamedata : dict, newvalue : int):
+    gamedata["since_last_generation"] = newvalue
     return gamedata
 
-def addHerbivore(gamedata : dict, position : tuple) -> dict:
-    assert type(gamedata) is dict
-    assert type(position) is tuple
-    herbivore = Herbivore.create(position)
-    gamedata['entities']['Herbivore'].append(herbivore)
+def set_currentstate(gamedata : dict, newstate : str, newvalue : bool)-> dict:
+    gamedata["currentstate"][newstate] = newvalue
+    return gamedata
+
+def change_currentstate(gamedata : dict,currentstate: str , newstate : str):
+    gamedata = set_currentstate(gamedata, newstate, True)
+    gamedata = set_currentstate(gamedata, currentstate, False)
     return gamedata
 
 def get_allposition(gamedata : dict) -> list:
@@ -83,6 +85,32 @@ def get_plante_position(gamedata : dict) -> list:
         position.append(i['position'])
     return position
 
+def get_currentstate(gamedata : dict) -> dict:
+    for i in gamedata["currentstate"]:
+        if gamedata["currentstate"][i] == True:
+            return i
+    
+
+def addPlante(gamedata : dict, position : tuple):
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    gamedata['entities']['Plante'].append(Plante.create(position))
+    return gamedata
+
+def addCarnivore(gamedata : dict, position : tuple) -> dict: 
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    carnivore = Carnivore.create(position)
+    gamedata['entities']['Carnivore'].append(carnivore)
+    return gamedata
+
+def addHerbivore(gamedata : dict, position : tuple) -> dict:
+    assert type(gamedata) is dict
+    assert type(position) is tuple
+    herbivore = Herbivore.create(position)
+    gamedata['entities']['Herbivore'].append(herbivore)
+    return gamedata
+
 def kill_plante(gamedata : dict, plantetokill : int):
     assert type(gamedata) is dict
     assert type(plantetokill) is int
@@ -127,3 +155,8 @@ def randomposition(gamedata : dict) -> tuple:
         if Herbivore.valid_move(gamedata, allposition, newposition):
             goodposition = True
             return newposition
+
+def is_game_ended(gamedata):
+    if len(get_herbivore(gamedata)) == 0 and len(get_carnivore(gamedata)) == 0:
+        return True
+    return False

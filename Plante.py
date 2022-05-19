@@ -1,7 +1,5 @@
-import random
-import Gamedata
-import Map
 import sys
+
 def create(position : tuple) -> dict():
     return {"skin" : "♣", 'position' : position, "color" : '32'}
 
