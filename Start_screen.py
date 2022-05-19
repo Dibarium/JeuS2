@@ -9,7 +9,7 @@ def create():
     for name in filenames:
         f = open(dossier+name).read().split("\n")
         frames.append([list(word) for word in f])
-    return {"selected" : {"Play" : True, "Help": False, "Quitter" : False}, "all_frames" : frames, "frame_state" : (0,False)}
+    return {"selected" : {"Play" : True, "Help": False, "Quit" : False}, "all_frames" : frames, "frame_state" : (0,False)}
 
 def get_current_selected(start):
     for i in start["selected"]:
@@ -53,17 +53,21 @@ def show(start, frame):
     sys.stdout.write("\033["+str(27)+";"+str(49)+"H")
     sys.stdout.write(u"\u001b[1m\u001b[37mQUIT\u001b[0m")
 
-    #Afficher le curseur
+    sys.stdout.write("\033["+str(100)+";"+str(100)+"H")
+    sys.stdout.flush()
+    
+def showcursor(start):
     count = 0
     for i in start["selected"]:
+        sys.stdout.write("\033["+str(25+count)+";"+str(47)+"H")
+        sys.stdout.write(u"\u001b[37m  \u001b[0m")
         if start["selected"][i] == True:
             sys.stdout.write("\033["+str(25+count)+";"+str(48)+"H")
             sys.stdout.write(u"\u001b[37m>\u001b[0m")
         count+=1
-
     sys.stdout.write("\033["+str(100)+";"+str(100)+"H")
     sys.stdout.flush()
-    
+
 def choose_image(start):
     listframes = get_all_frames(start)
     imagenumber,state = get_framestate(start)
@@ -82,14 +86,14 @@ def select(start, direction):
     if direction == "s":
         for i in start["selected"]:
             if i == currentselect:
-                if i == "Quitter":
+                if i == "Quit":
                     start = set_selected(start, "Play", True)
                     start = set_selected(start, i, False)
                 elif i == "Play":
                     start = set_selected(start, "Help", True)
                     start = set_selected(start, i, False)
                 elif i == "Help":
-                    start = set_selected(start, "Quitter", True)
+                    start = set_selected(start, "Quit", True)
                     start = set_selected(start, i, False)
     if direction == "z":
         for i in start["selected"]:
@@ -97,11 +101,11 @@ def select(start, direction):
                 if i == "Help":
                     start = set_selected(start, "Play", True)
                     start = set_selected(start, i, False)
-                elif i == "Quitter":
+                elif i == "Quit":
                     start = set_selected(start, "Help", True)
                     start = set_selected(start, i, False)
                 elif i == "Play":
-                    start = set_selected(start, "Quitter", True)
+                    start = set_selected(start, "Quit", True)
                     start = set_selected(start, i, False)
     return start
 

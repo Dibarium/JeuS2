@@ -5,13 +5,17 @@ import Map
 import random
 import math
 
-def create() -> dict:
+def create(State) -> dict:
     gamedata = dict()
     gamedata['carte'] = None
     entities = {'Plante' : [], 'Carnivore' : [], 'Herbivore' : []}
     gamedata['entities'] = entities
-    gamedata["currentstate"] = {"Start" : True, "Parametrage" : False, "Help" : False, "Play" : False}
+    gamedata["currentstate"] = {"Start" : False, "Parametrage" : False, "Help" : False, "Play" : False, "End" : False}
     gamedata["since_last_generation"] = 0
+    for i in gamedata["currentstate"]:
+        if i == State:
+            gamedata["currentstate"][i] = True
+    
     return gamedata
 
 def get_since_last_generation(gamedata):
@@ -151,3 +155,8 @@ def randomposition(gamedata : dict) -> tuple:
         if Herbivore.valid_move(gamedata, allposition, newposition):
             goodposition = True
             return newposition
+
+def is_game_ended(gamedata):
+    if len(get_herbivore(gamedata)) == 0 and len(get_carnivore(gamedata)) == 0:
+        return True
+    return False
